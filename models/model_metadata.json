@@ -1,0 +1,80 @@
+{
+  "feature_cols": [
+    "Nitrogen",
+    "Phosphorus",
+    "Potassium",
+    "Temperature",
+    "Humidity",
+    "pH_Value",
+    "Rainfall"
+  ],
+  "feature_short": [
+    "N",
+    "P",
+    "K",
+    "Temp",
+    "Humidity",
+    "pH",
+    "Rainfall"
+  ],
+  "feature_ranges": {
+    "Nitrogen": [
+      0,
+      200
+    ],
+    "Phosphorus": [
+      0,
+      200
+    ],
+    "Potassium": [
+      0,
+      200
+    ],
+    "Temperature": [
+      0,
+      50
+    ],
+    "Humidity": [
+      0,
+      100
+    ],
+    "pH_Value": [
+      0,
+      14
+    ],
+    "Rainfall": [
+      0,
+      500
+    ]
+  },
+  "target_col": "Crop",
+  "drop_cols": [
+    "Soil_Type",
+    "Variety"
+  ],
+  "n_classes": 22,
+  "crop_classes": [
+    "apple",
+    "banana",
+    "blackgram",
+    "chickpea",
+    "coconut",
+    "coffee",
+    "cotton",
+    "grapes",
+    "jute",
+    "kidneybeans",
+    "lentil",
+    "maize",
+    "mango",
+    "mothbeans",
+    "mungbean",
+    "muskmelon",
+    "orange",
+    "papaya",
+    "pigeonpeas",
+    "pomegranate",
+    "rice",
+    "watermelon"
+  ]
+}
