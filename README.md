@@ -71,7 +71,7 @@ GROQ_API_KEY=your_groq_api_key_here
 
 # Text To Speech API (Navigate Labs or alternative compatible)
 TTS_API_KEY=your_tts_api_key_here
-TTS_BASE_URL=https://apidev.navigatelabsai.com/
+TTS_BASE_URL=your_tts_base_url
 ```
 
 #### How to get the `GROQ_API_KEY`:
