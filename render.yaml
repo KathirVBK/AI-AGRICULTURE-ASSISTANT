@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: agrisense-backend
+    plan: free
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "*" # Update this with your Vercel URL after deployment

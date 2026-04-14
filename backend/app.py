@@ -34,14 +34,7 @@ async def startup_event():
 # Initialize Groq client for STT
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# Enable CORS for React frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -263,9 +256,21 @@ async def speech_to_text(audio_file: UploadFile = File(...)):
             os.remove(temp_audio_path)
         raise HTTPException(status_code=500, detail=f"Speech-to-text failed: {str(e)}")
 
+# Enable CORS for React frontend
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(api_router)
 
 if __name__ == "__main__":
     import uvicorn
-    # Using 127.0.0.1 instead of 0.0.0.0 often fixes "Failed to fetch" on Windows
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    # Render provides the PORT environment variable
+    port = int(os.getenv("PORT", 8000))
+    # Use 0.0.0.0 to bind to all available interfaces in a container/server environment
+    uvicorn.run(app, host="0.0.0.0", port=port)
