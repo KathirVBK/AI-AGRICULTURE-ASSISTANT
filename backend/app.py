@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, APIRouter, Depends, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import Response
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional, Dict
 from sqlalchemy.orm import Session
@@ -62,6 +63,9 @@ class GoogleLoginRequest(BaseModel):
 class ChatRequest(BaseModel):
     query: str
     session_id: str = "default"
+
+class TTSRequest(BaseModel):
+    text: str
 
 # ── Auth Logic ──────────────────────────────────────────────
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
@@ -255,6 +259,16 @@ async def speech_to_text(audio_file: UploadFile = File(...)):
         if 'temp_audio_path' in locals() and os.path.exists(temp_audio_path):
             os.remove(temp_audio_path)
         raise HTTPException(status_code=500, detail=f"Speech-to-text failed: {str(e)}")
+
+@api_router.post("/tts")
+async def text_to_speech(request: TTSRequest):
+    try:
+        from voice.tts import generate_speech
+        audio_bytes = generate_speech(request.text)
+        return Response(content=audio_bytes, media_type="audio/mpeg")
+    except Exception as e:
+        logger.error(f"Error during text-to-speech: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Enable CORS for React frontend
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
