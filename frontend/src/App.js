@@ -28,7 +28,6 @@ import {
   FileText,
   UploadCloud,
   Volume2,
-  Square,
 } from 'lucide-react';
 import './App.css';
 import AuthPage from './components/Auth/AuthPage';
@@ -352,7 +351,6 @@ function AppContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  const [sessionsLoaded, setSessionsLoaded] = useState(false);
 
   const createNewSession = useCallback(async () => {
     const newSession = {
@@ -383,10 +381,8 @@ function AppContent() {
     if (!user) {
       setSessions([]);
       setActiveSessionId(null);
-      setSessionsLoaded(false);
       return;
     }
-    setSessionsLoaded(false);
     axios.get(`${API_BASE_URL}/sessions`)
       .then(res => {
         const loaded = res.data.sessions || [];
@@ -400,12 +396,10 @@ function AppContent() {
         } else {
           createNewSession();
         }
-        setSessionsLoaded(true);
       })
       .catch(err => {
         console.error('Failed to load sessions:', err);
         createNewSession();
-        setSessionsLoaded(true);
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
