@@ -17,21 +17,36 @@ def initialize_firebase():
     """Initialize Firebase Admin SDK (idempotent)."""
     if not firebase_admin._apps:
         try:
-            # 1. Try loading from environment variable first (for production)
-            env_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
-            if env_json:
-                logger.info("Initializing Firebase Admin SDK from environment variable...")
-                service_account_info = json.loads(env_json)
+            # 1. Try loading from individual environment variables first (reconstructing the certificate dict)
+            project_id = os.getenv("FIREBASE_PROJECT_ID")
+            private_key = os.getenv("FIREBASE_PRIVATE_KEY")
+            client_email = os.getenv("FIREBASE_CLIENT_EMAIL")
+
+            if project_id and private_key and client_email:
+                logger.info("Initializing Firebase Admin SDK from individual environment variables...")
+                # Reconstruct the private key replacing escaped newlines
+                formatted_private_key = private_key.replace("\\n", "\n")
+                service_account_info = {
+                    "type": "service_account",
+                    "project_id": project_id,
+                    "private_key": formatted_private_key,
+                    "client_email": client_email,
+                }
                 cred = credentials.Certificate(service_account_info)
-            # 2. Fall back to local file (for local development)
+            # 2. Try loading from single environment variable (fallback)
+            elif os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON"):
+                logger.info("Initializing Firebase Admin SDK from FIREBASE_SERVICE_ACCOUNT_JSON...")
+                service_account_info = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON"))
+                cred = credentials.Certificate(service_account_info)
+            # 3. Fall back to local file (for local development)
             elif os.path.exists(SERVICE_ACCOUNT_PATH):
                 logger.info("Initializing Firebase Admin SDK from local file...")
                 cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
             else:
                 raise FileNotFoundError(
-                    f"Firebase credentials not found. Please set the "
-                    f"FIREBASE_SERVICE_ACCOUNT_JSON environment variable or ensure "
-                    f"the file exists at: {SERVICE_ACCOUNT_PATH}"
+                    f"Firebase credentials not found. Please set individual environment variables "
+                    f"(FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL) "
+                    f"or ensure the local file exists at: {SERVICE_ACCOUNT_PATH}"
                 )
             
             firebase_admin.initialize_app(cred)
