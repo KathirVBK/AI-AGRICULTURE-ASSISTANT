@@ -31,6 +31,7 @@ def initialize_firebase():
                     "project_id": project_id,
                     "private_key": formatted_private_key,
                     "client_email": client_email,
+                    "token_uri": "https://oauth2.googleapis.com/token"
                 }
                 cred = credentials.Certificate(service_account_info)
             # 2. Try loading from single environment variable (fallback)
