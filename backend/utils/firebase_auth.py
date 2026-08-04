@@ -13,8 +13,13 @@ SERVICE_ACCOUNT_PATH = os.path.join(
 
 import json
 
+_firebase_initialized = False
+
 def initialize_firebase():
     """Initialize Firebase Admin SDK (idempotent)."""
+    global _firebase_initialized
+    if _firebase_initialized:
+        return
     if not firebase_admin._apps:
         try:
             # 1. Try loading from individual environment variables first (reconstructing the certificate dict)
@@ -51,17 +56,24 @@ def initialize_firebase():
                 )
             
             firebase_admin.initialize_app(cred)
+            _firebase_initialized = True
             logger.info("✔️ Firebase Admin SDK initialized successfully.")
         except Exception as e:
             logger.error(f"❌ Failed to initialize Firebase Admin SDK: {e}")
-            raise
+            _firebase_initialized = False
+            # Gracefully continue startup without crashing uvicorn.
+            # Auth failures will be handled gracefully during request processing.
+    else:
+        _firebase_initialized = True
 
 def verify_firebase_token(id_token: str) -> dict:
     """
     Verify a Firebase ID token and return the decoded payload.
     Returns a dict with: uid, email, name, picture
-    Raises ValueError if the token is invalid.
+    Raises ValueError if the token is invalid or Firebase is not initialized.
     """
+    if not _firebase_initialized:
+        raise ValueError("Firebase authentication is not configured on the backend. Please check backend environment variables.")
     try:
         decoded_token = firebase_auth_module.verify_id_token(id_token)
         return {
@@ -76,3 +88,4 @@ def verify_firebase_token(id_token: str) -> dict:
         raise ValueError("Invalid Firebase token.")
     except Exception as e:
         raise ValueError(f"Token verification failed: {str(e)}")
+
