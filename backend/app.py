@@ -314,23 +314,35 @@ async def chat(
             ChatSession.id == session_id,
             ChatSession.user_id == current_user.id
         ).first()
-        if db_session:
-            db.add(ChatMessage(
-                session_id=session_id,
-                role="user",
-                content=request.query,
-                timestamp=now_ts
-            ))
-            db.add(ChatMessage(
-                session_id=session_id,
-                role="assistant",
-                content=answer,
-                follow_ups=json.dumps(follow_ups) if follow_ups else None,
-                trace=json.dumps(trace) if trace else None,
-                timestamp=now_ts
-            ))
-            db_session.updated_at = datetime.datetime.utcnow()
+        
+        if not db_session:
+            # Auto-create the session if it was not created/persisted yet
+            short_title = request.query[:28] + "…" if len(request.query) > 28 else request.query
+            db_session = ChatSession(
+                id=session_id,
+                user_id=current_user.id,
+                title=short_title
+            )
+            db.add(db_session)
             db.commit()
+            db.refresh(db_session)
+
+        db.add(ChatMessage(
+            session_id=session_id,
+            role="user",
+            content=request.query,
+            timestamp=now_ts
+        ))
+        db.add(ChatMessage(
+            session_id=session_id,
+            role="assistant",
+            content=answer,
+            follow_ups=json.dumps(follow_ups) if follow_ups else None,
+            trace=json.dumps(trace) if trace else None,
+            timestamp=now_ts
+        ))
+        db_session.updated_at = datetime.datetime.utcnow()
+        db.commit()
 
         return {
             "answer": answer,

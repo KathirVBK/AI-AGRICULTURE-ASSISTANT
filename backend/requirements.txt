@@ -19,4 +19,5 @@ python-multipart==0.0.22
 sqlalchemy==2.0.48
 google-auth==2.49.1
 firebase-admin==7.5.0
-ddgs==9.11.4
+ddgs==9.11.4
+psycopg2-binary>=2.9.9
