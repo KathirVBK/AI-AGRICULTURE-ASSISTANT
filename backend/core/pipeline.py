@@ -282,12 +282,11 @@ def _build_attribution_block(retrieval_meta: dict) -> str:
     t2 = retrieval_meta["tier2_knowledge_base"]
     t3 = retrieval_meta["tier3_web_search"]
 
-    lines.append(
-        f"Tier 1 — Uploaded Document:   {'AVAILABLE (cite as \"Per your soil report:\")' if t1['used'] else 'NOT AVAILABLE'}"
-    )
-    lines.append(
-        f"Tier 2 — Knowledge Base:       {'AVAILABLE (cite as \"Per the knowledge base:\")' if t2['used'] else 'NOT AVAILABLE'}"
-    )
+    t1_status = 'AVAILABLE (cite as "Per your soil report:")' if t1['used'] else 'NOT AVAILABLE'
+    t2_status = 'AVAILABLE (cite as "Per the knowledge base:")' if t2['used'] else 'NOT AVAILABLE'
+
+    lines.append(f"Tier 1 — Uploaded Document:   {t1_status}")
+    lines.append(f"Tier 2 — Knowledge Base:       {t2_status}")
 
     if t3["used"]:
         lines.append("Tier 3 — Web Search:           AVAILABLE (cite as \"Per web sources:\")")
