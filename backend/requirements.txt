@@ -18,4 +18,5 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.22
 sqlalchemy==2.0.48
 google-auth==2.49.1
-firebase-admin==7.5.0
+firebase-admin==7.5.0
+ddgs==9.11.4

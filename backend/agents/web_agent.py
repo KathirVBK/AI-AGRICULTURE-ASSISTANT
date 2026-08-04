@@ -5,6 +5,7 @@ Web search agent using DuckDuckGo Search.
 
 import sys
 import urllib.parse
+import re
 from ddgs import DDGS
 
 
