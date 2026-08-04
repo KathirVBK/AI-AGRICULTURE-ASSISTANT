@@ -5,7 +5,7 @@ Pre-loads models at import time to prevent first-query latency.
 
 from pathlib import Path
 import logging
-from langchain_huggingface import HuggingFaceEmbeddings
+from rag.embeddings import get_embedding_model
 from langchain_chroma import Chroma
 
 logger = logging.getLogger(__name__)
@@ -20,8 +20,8 @@ def get_embedding():
     """Lazily initialize or return the pre-loaded HuggingFace embedding model."""
     global _embedding
     if _embedding is None:
-        logger.info("Initializing HuggingFace Embedding Model (all-MiniLM-L6-v2)...")
-        _embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        logger.info("Initializing OpenAI Embedding Model (text-embedding-3-small)...")
+        _embedding = get_embedding_model()
     return _embedding
 
 def get_vectorstore():

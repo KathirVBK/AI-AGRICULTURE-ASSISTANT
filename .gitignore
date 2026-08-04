@@ -39,11 +39,17 @@ frontend/build/
 frontend/dist/
 .npm/
 
+# User uploads (runtime files, not source code)
+backend/uploads/
+
 # IDEs
 .idea/
 .vscode/
 *.swp
 *.swo
+
+# Firebase
+firebase_service_account.json
 
 # OS Data
 .DS_Store

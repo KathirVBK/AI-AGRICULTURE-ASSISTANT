@@ -9,6 +9,7 @@ CROP_MASTER = {
     "rice": {
         "canonical": "Rice (Paddy)",
         "aliases": ["rice", "paddy", "nellu"],
+        "regions": ["tamil nadu", "punjab", "andhra pradesh", "west bengal", "uttar pradesh", "plains", "all_plains"],
         "temp": {"min": 20, "max": 35},
         "ph": {"min": 5.0, "max": 7.5},
         "rain": {"min": 1000, "max": 2500},
@@ -18,6 +19,7 @@ CROP_MASTER = {
     "sugarcane": {
         "canonical": "Sugarcane",
         "aliases": ["sugarcane", "karumbu"],
+        "regions": ["tamil nadu", "maharashtra", "karnataka", "uttar pradesh", "plains"],
         "temp": {"min": 20, "max": 40},
         "ph": {"min": 6.5, "max": 7.5},
         "rain": {"min": 750, "max": 1200},
@@ -27,6 +29,7 @@ CROP_MASTER = {
     "turmeric": {
         "canonical": "Turmeric",
         "aliases": ["turmeric", "manjal"],
+        "regions": ["tamil nadu", "telangana", "maharashtra", "erode", "plains"],
         "temp": {"min": 20, "max": 30},
         "ph": {"min": 4.5, "max": 7.5},
         "rain": {"min": 1500, "max": 2500},
@@ -36,6 +39,7 @@ CROP_MASTER = {
     "pigeon_pea": {
         "canonical": "Pigeon Pea (Arhar/Tur)",
         "aliases": ["pigeon pea", "tur", "arhar", "thandai"],
+        "regions": ["maharashtra", "karnataka", "madhya pradesh", "plains"],
         "temp": {"min": 18, "max": 35},
         "ph": {"min": 5.0, "max": 8.0},
         "rain": {"min": 600, "max": 1000},
@@ -45,6 +49,7 @@ CROP_MASTER = {
     "sorghum": {
         "canonical": "Sorghum (Jowar)",
         "aliases": ["sorghum", "jowar", "cholam"],
+        "regions": ["maharashtra", "karnataka", "tamil nadu", "plains"],
         "temp": {"min": 25, "max": 35},
         "ph": {"min": 5.5, "max": 8.5},
         "rain": {"min": 400, "max": 600},
@@ -54,6 +59,7 @@ CROP_MASTER = {
     "banana": {
         "canonical": "Banana",
         "aliases": ["banana", "vazhai"],
+        "regions": ["tamil nadu", "kerala", "maharashtra", "andhra pradesh", "plains"],
         "temp": {"min": 15, "max": 35},
         "ph": {"min": 6.5, "max": 7.5},
         "rain": {"min": 1500, "max": 2500},
@@ -63,6 +69,7 @@ CROP_MASTER = {
     "coconut": {
         "canonical": "Coconut",
         "aliases": ["coconut", "thennai"],
+        "regions": ["kerala", "tamil nadu", "karnataka", "coastal"],
         "temp": {"min": 20, "max": 32},
         "ph": {"min": 5.0, "max": 8.0},
         "rain": {"min": 1000, "max": 2500},
@@ -72,6 +79,7 @@ CROP_MASTER = {
     "maize": {
         "canonical": "Maize (Corn)",
         "aliases": ["maize", "corn", "makkacholam"],
+        "regions": ["karnataka", "madhya pradesh", "maharashtra", "plains"],
         "temp": {"min": 18, "max": 35},
         "ph": {"min": 5.5, "max": 7.5},
         "rain": {"min": 600, "max": 1000},
@@ -81,6 +89,7 @@ CROP_MASTER = {
     "cotton": {
         "canonical": "Cotton",
         "aliases": ["cotton", "paruthi"],
+        "regions": ["gujarat", "maharashtra", "telangana", "plains"],
         "temp": {"min": 21, "max": 30},
         "ph": {"min": 5.5, "max": 8.5},
         "rain": {"min": 500, "max": 1000},

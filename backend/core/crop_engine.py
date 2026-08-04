@@ -13,7 +13,7 @@ CROP_DB = []
 for key, info in CROP_MASTER.items():
     CROP_DB.append({
         "name": info["canonical"],
-        "region": ["all", "global", "india"],  # Unbiased global default
+        "region": info.get("regions", []),
         "season": ["kharif", "rabi", "summer", "all"], 
         "ph_range": (info["ph"]["min"], info["ph"]["max"]),
         "water": "high" if info["rain"]["min"] > 1000 else "low",
@@ -24,11 +24,10 @@ def filter_crops(region, month, ph=None, water=None):
     results = []
 
     for crop in CROP_DB:
-        # region match - relaxed to support all regions uniformly
         region_list = [r.lower() for r in crop["region"]]
         
-        # We assume crops can grow if the region constraint is empty or matches global aliases
-        if region and region.lower() not in region_list and "all" not in region_list:
+        # Strict region match: if a region is queried, it MUST be in the crop's supported regions
+        if region and region.lower() not in region_list:
             continue
 
         # season match

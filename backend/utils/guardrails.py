@@ -13,20 +13,23 @@ AGRI_KEYWORDS = [
     "farm", "vegetable", "vegetables", "fruit", "fruits", "ph",
     "humidity", "temperature", "cultivate", "cultivation", "grow", "growing",
     "season", "region", "climate", "field", "garden", "greenhouse",
-    # Specific crops
+    "tractor", "machinery", "plough", "plow", "sowing", "sow", "organic",
+    "hydroponics", "aquaponics", "poultry", "livestock", "dairy", "cattle",
+    # Specific crops & plurals
     "rice", "wheat", "paddy", "maize", "corn", "cotton", "sugarcane",
-    "banana", "coconut", "sorghum", "millet", "millets", "turmeric",
-    "groundnut", "soybean", "mustard", "sunflower", "potato", "tomato",
-    "onion", "chilies", "chilli", "coffee", "tea", "rubber", "jute",
+    "banana", "bananas", "coconut", "coconuts", "sorghum", "millet", "millets", "turmeric",
+    "groundnut", "soybean", "mustard", "sunflower", "potato", "potatoes", "tomato", "tomatoes",
+    "onion", "onions", "chilies", "chilli", "chillies", "coffee", "tea", "rubber", "jute",
     "pigeon pea", "arhar", "chickpea", "lentil", "cowpea", "barley",
-    # Topics
+    "mango", "mangoes", "guava", "papaya", "citrus", "apple", "apples", "grape", "grapes", "strawberry",
+    # Topics, pathology & care
     "nutrient", "nitrogen", "phosphorus", "potassium", "npk", "compost",
     "manure", "organic", "drip", "sprinkler", "weed", "weedicide",
-    "fungicide", "disease", "blight", "rot", "insect", "aphid", "thrips",
-    "intercrop", "intercropping", "crop rotation", "mulch", "mulching",
+    "fungicide", "disease", "diseases", "blight", "rot", "insect", "aphid", "thrips",
+    "virus", "viruses", "leaf", "leaves", "curl", "wilt", "wilting", "treatment", "treatments",
+    "symptom", "symptoms", "infection", "intercrop", "intercropping", "crop rotation", "mulch", "mulching",
     "water", "drought", "flood", "rainfed", "irrigated", "greenhouse",
-    "grow", "plant", "sow", "sowing", "germinate", "tilling", "plowing",
-    "livestock", "poultry", "dairy", "manure", "vermicompost",
+    "germinate", "tilling", "vermicompost", "sericulture", "apiculture",
 ]
 
 # Terms that explicitly signal a non-agri or off-topic query
@@ -36,56 +39,84 @@ NON_AGRI_SIGNALS = [
     "python programming", "javascript", "software", "hardware", "physics",
     "chemistry", "math", "history", "geography", "space shuttle",
     "rocket", "nasa", "planet", "galaxy", "bitcoin", "crypto", "stock market",
-    "fashion", "gaming", "esports", "music", "song", "lyrics",
+    "fashion", "gaming", "esports", "music", "song", "lyrics", "joke",
+    "travel", "hotels", "flight", "tickets", "medicine", "doctor", "health",
+    "recipe", "cooking", "chef", "restaurant", "hair", "skin", "muscle",
+    "weight loss", "fitness", "exercise",
 ]
 
 # Ambiguous words that look agri but aren't in this context
 AMBIGUOUS = ["space", "outer space", "universe", "moon", "mars"]
 
 
-def is_agri_query(query: str) -> bool:
+# Conversational steering / follow-up keywords allowed when in chat
+CONVERSATIONAL_STEERING = [
+    "step", "steps", "guide", "guided", "guidance", "first", "second", "next",
+    "continue", "how", "process", "beginner", "expert", "explain", "details",
+    "tell me", "start", "proceed", "option", "yes", "ok", "okay", "done", "finished"
+]
+
+
+def is_agri_query(query: str, history: list = None) -> bool:
     """
-    Determines if a query is related to agriculture.
-    Uses a combination of keyword matching and signal detection.
+    Determines if a query is related to agriculture or is a valid conversational steering instruction.
+    Uses a combination of keyword matching, chat history context, and signal detection.
     """
     q = query.lower().strip()
+    clean_q = re.sub(r'[^\w\s]', '', q)
     
-    # Check for ambiguous space/planet terms
+    # 1. Allow common greetings
+    if clean_q in ["hello", "hi", "hey", "help", "thanks", "thank you", "good morning", "good evening"]:
+        return True
+
+    # 2. Allow conversational steering/follow-ups if chat history exists or if query has steering words
+    if history and len(history) > 0:
+        # User is in an ongoing farming consultation session — allow follow-ups unless explicitly off-topic
+        has_non_agri = any(re.search(rf"\b{kw}\b", q) for kw in NON_AGRI_SIGNALS)
+        if not has_non_agri:
+            return True
+
+    # Allow steering phrases (e.g. "guide me step by step")
+    has_steering = any(re.search(rf"\b{kw}\b", q) for kw in CONVERSATIONAL_STEERING)
+    if has_steering:
+        has_non_agri = any(re.search(rf"\b{kw}\b", q) for kw in NON_AGRI_SIGNALS)
+        if not has_non_agri:
+            return True
+
+    # 3. Check space/planet terms
     if any(word in q for word in AMBIGUOUS):
-        # Unless it specifically mentions "farming" or "crops" in a way that isn't space-related
-        if not any(word in q for word in ["earth", "soil", "terrestrial"]):
+        if not any(word in q for word in ["earth", "soil", "terrestrial", "land"]):
             return False
 
     has_agri = any(re.search(rf"\b{kw}\b", q) for kw in AGRI_KEYWORDS)
     has_non_agri = any(re.search(rf"\b{kw}\b", q) for kw in NON_AGRI_SIGNALS)
     
-    # If it has non-agri signals and no strong agri keywords, reject.
-    if has_non_agri and not has_agri:
-        return False
+    # Rejection logic
+    if has_non_agri:
+        strong_agri = ["crop", "soil", "fertilizer", "irrigation", "pest", "pesticide", "harvest", "npk"]
+        if not any(re.search(rf"\b{kw}\b", q) for kw in strong_agri):
+            return False
         
-    # If it has no agri keywords at all, reject.
-    if not has_agri:
-        # Check if it's a greeting or very short common phrase
-        if q in ["hello", "hi", "hey", "help", "thanks", "thank you"]:
-            return True
+    if not has_agri and not has_steering:
         return False
         
     return True
 
 
-def guardrail_response(query: str):
+def guardrail_response(query: str, history: list = None):
     """
     Returns (allowed: bool, message: str | None).
     If allowed=False, message contains the professional refusal.
     """
-    if not is_agri_query(query):
+    if not is_agri_query(query, history=history):
         return False, (
             "❌ I am the AgriSense AI Assistant, strictly dedicated to agricultural guidance.\n\n"
-            "I can assist with:\n"
-            "  • Crop selection and cultivation steps\n"
-            "  • Soil health and fertilizer management (NPK, pH)\n"
-            "  • Pest, disease, and weed control\n"
-            "  • Irrigation and weather-related advice\n\n"
+            "I can only help with agriculture-based questions, such as:\n"
+            "  • Crop selection, sowing, and cultivation steps\n"
+            "  • Soil health, pH levels, and fertilizer management (NPK)\n"
+            "  • Pest, disease, and weed control strategies\n"
+            "  • Irrigation, weather impacts, and harvesting advice\n\n"
             "Please rephrase your question to focus on these agricultural topics."
         )
     return True, None
+

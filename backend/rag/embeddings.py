@@ -2,10 +2,14 @@
 AgriSense-AI — embeddings.py
 """
 
-from langchain_huggingface import HuggingFaceEmbeddings
-
+from langchain_openai import OpenAIEmbeddings
+import os
+from dotenv import load_dotenv
 
 def get_embedding_model():
-    return HuggingFaceEmbeddings(
-        model_name="all-MiniLM-L6-v2"
+    load_dotenv()
+    return OpenAIEmbeddings(
+        model="text-embedding-3-small",
+        openai_api_key=os.getenv("NAVIGATE_API_KEY"),
+        openai_api_base=os.getenv("NAVIGATE_BASE_URL")
     )

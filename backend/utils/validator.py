@@ -50,9 +50,9 @@ def validate_input(query: str) -> str | None:
     if re.search(r"(.)\1{4,}", q_strip):
         return "❌ Input contains too many repetitive characters. Please provide a clear question."
 
-    # Extremely long input — likely a paste error
-    if len(query) > 1000:
-        return "❌ Query is too long. Please keep it under 1000 characters."
+    # Extremely long input check (allow soil reports and detailed field notes up to 10000 chars)
+    if len(query) > 10000:
+        return "❌ Query is too long. Please keep it under 10000 characters."
 
     query_low = q_strip.lower()
 

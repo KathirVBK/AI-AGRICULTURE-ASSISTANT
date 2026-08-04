@@ -3,7 +3,7 @@ AgriSense-AI — ingest.py
 """
 
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from pathlib import Path
 from rag.embeddings import get_embedding_model
