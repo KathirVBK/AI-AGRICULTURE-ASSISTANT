@@ -13,6 +13,8 @@ services:
         sync: false
       - key: NAVIGATE_BASE_URL
         value: "https://apidev.navigatelabsai.com/v1"
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
       - key: ALLOWED_ORIGINS
         value: "*" # Update this with your frontend URL after deployment
 
